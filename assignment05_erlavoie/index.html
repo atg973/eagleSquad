@@ -73,13 +73,8 @@ function loadDoc() {
 
 //  https://www.sitepoint.com/introduction-chart-js-2-0-six-examples/
 function sum(array) {
-	var tempsum;
-	for (let element of array) {
-		//for (let sub of element){
-			tempsum += parseInt(element)
-		//};
-		//tempsum.push
-	};
+	var tempsum = 0;
+	array.forEach(element => tempsum = tempsum + parseInt(element));
 	return tempsum;
 }
 
