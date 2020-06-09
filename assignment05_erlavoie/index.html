@@ -19,54 +19,87 @@
 </head>
 
 <body>
-<h2>Canvas element</h2>
+<h2>COVID-19 Confirmed Cases for April</h2>
 <canvas id="myChart"></canvas>
 
 <h2>AJAX example</h2><div id="demo">
-  <p>Content to change</p>
+  <p>Full Dataset</p>
   
 </div>
-<button type="button" onclick="loadDoc()">Change Content</button>
+<button type="button" onclick="loadDoc()">Load full dataset</button>
 
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
 <script>
-var URL = "https://api.covid19api.com/summary";
+var URL = "https://api.covid19api.com/dayone/country/united-states/status/confirmed";
 var covidJson;
+var dates = ["2020-04-01", "2020-04-08", "2020-04-16", "2020-04-24", "2020-04-30"];
+var indiana = [];
+var michigan = [];
 
 // modified from: https://www.w3schools.com/js/js_ajax_intro.asp
 function loadDoc() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-     covidJson = this.responseText;
-     covidJson = JSON.parse(covidJson);
-     console.log(covidJson.Global.NewConfirmed);
-     document.getElementById("demo").innerHTML = this.responseText;
+		covidJson = this.responseText;
+		covidJson = JSON.parse(covidJson);
+		console.log(covidJson.Province="Michigan");
+		document.getElementById("demo").innerHTML = this.responseText;
+		dates.forEach(date => indiana.push(sum(map(filter(filter(covidJson, entry => entry.Province == "Indiana"),entry => entry.Date.includes(date)), entry => entry.Cases)))); // filter by indiana 
+		dates.forEach(date => michigan.push(sum(map(filter(filter(covidJson, entry => entry.Province == "Michigan"),entry => entry.Date.includes(date)), entry => entry.Cases)))); // filter by michigan
+		var ctx = document.getElementById('myChart').getContext('2d');
+		var myChart = new Chart(ctx, {
+			type: 'line',
+			data: {
+			labels: ['May 1', 'May 8', 'May 16', 'May 24', 'May 31'],
+			datasets: [{
+			label: 'Indiana',
+			data: indiana, 
+			backgroundColor: "rgba(153,255,51,0.4)"
+			}, {
+			label: 'Michigan',
+			data: michigan, 
+			backgroundColor: "rgba(255,153,0,0.4)"
+			}]
+			}
+		});
     }
   };
   xhttp.open("GET", URL, true);
   xhttp.send();
 }
 
-// verbatim from https://www.sitepoint.com/introduction-chart-js-2-0-six-examples/
-var ctx = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-    datasets: [{
-      label: 'apples',
-      data: [12, 19, 3, 17, 6, 3, 7],
-      backgroundColor: "rgba(153,255,51,0.4)"
-    }, {
-      label: 'oranges',
-      data: [2, 29, 5, 5, 2, 3, 10],
-      backgroundColor: "rgba(255,153,0,0.4)"
-    }]
+//  https://www.sitepoint.com/introduction-chart-js-2-0-six-examples/
+function sum(array) {
+	var tempsum;
+	for (let element of array) {
+		//for (let sub of element){
+			tempsum += parseInt(element)
+		//};
+		//tempsum.push
+	};
+	return tempsum;
+}
+
+function map(array, transform) {
+  let mapped = [];
+  for (let element of array) {
+    mapped.push(transform(element));
   }
-});
+  return mapped;
+}
+
+function filter(array2, test) {
+  let passed = [];
+  for (let element of array2) {
+    if (test(element)) {
+      passed.push(element);
+    }
+  }
+  return passed;
+}
 </script>
  
 <!-- Footer -->
